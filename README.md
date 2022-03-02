@@ -1,2 +1,3 @@
 # eiopa_ir_curves
-The script takes rfr from eiopa, split them by currency and calculate forward 1y rates, and after save an excel file with all economies with thei respective interest rate curves (with VA, no Va) bothe shocked up and down.
+The script takes risk free rate curves published by eiopa, split them by currency and calculate forward 1 year rates.
+After that, it saves an excel file with all economies with their respective interest rate curves (spot, forward, with VA, no Va, shocked up and down).
