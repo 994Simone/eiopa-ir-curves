@@ -7,7 +7,7 @@ Created on Mon Feb 28 10:12:41 2022
 import pandas as pd
 import numpy as np
 
-
+#Function to clean the dataframe imported from EIOPA excel file
 def rfrPrepareInput(df):
     len_df = len(df.columns)
     
