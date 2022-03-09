@@ -1,9 +1,9 @@
 import pandas as pd
-from module_interest_rates import calculate_1y_forwardRates
+from interest_rates.forward_rates import calc_1y_forward_rates
 
 # Non-fixed input (user can change them)
 inputPath = r"C:\Users\HP557LA\Downloads\December 2021 - EN"
-outputPath = r"C:\OutputPython"
+outputPath = r"C:\Python\OutputPython"
 curve_tmp = "\curve_tmp.xlsx"
 outputFile = "\curve_final.xlsx"
 
@@ -37,18 +37,23 @@ dfMaturity = dfList[0]["Maturity"]
 for headerPosition in range(len(headers)):
     dfListSplit[headerPosition] = pd.concat((dfListSplit[headerPosition],dfMaturity),axis=1)
     for dfPosition in range(len(dfList)):
-        df = dfList[dfPosition][headers[headerPosition]].rename(headers[headerPosition]+"_"+curveTypes[dfPosition])
+        df = dfList[dfPosition][headers[headerPosition]].rename(curveTypes[dfPosition])
         dfListSplit[headerPosition] = pd.concat((dfListSplit[headerPosition],df),axis=1)
 
 # Calculate 1y forward rates for each country and curve
 for economyPosition in range(len(economy)):
     for curvePosition in range(len(curveTypes)):
-        countryCurve = headers[economyPosition]+"_"+curveTypes[curvePosition]
-        calculate_1y_forwardRates(dfListSplit[economyPosition],countryCurve)
-        dfListSplit[economyPosition] = dfListSplit[economyPosition].drop(columns=[countryCurve+"_shift"])
+        calc_1y_forward_rates(dfListSplit[economyPosition],curveTypes[curvePosition])
+        dfListSplit[economyPosition] = dfListSplit[economyPosition].drop(columns=[curveTypes[curvePosition]+"_shift"])
     dfListSplit[economyPosition].insert(0,"Economy",economy[economyPosition])
 
-# Save the final output
+# Save the final output in Excel
 with pd.ExcelWriter(outputPath + outputFile) as writer:
     for economyPosition in range(len(economy)):
         dfListSplit[economyPosition].to_excel(writer, sheet_name=economy[economyPosition],index=False)
+        
+# Save output in .json for unittesting
+dfOutput = pd.DataFrame()
+for df in dfListSplit:
+    dfOutput = pd.concat((dfOutput,df)).reset_index(drop=True)
+jsonOutput = dfOutput.to_json(outputPath+"\output.json")
